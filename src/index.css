@@ -1,0 +1,47 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  .prose {
+    --tw-prose-body: #000000 !important;
+    --tw-prose-headings: #000000 !important;
+    --tw-prose-lead: #000000 !important;
+    --tw-prose-links: #2563eb !important;
+    --tw-prose-bold: #000000 !important;
+    --tw-prose-counters: #000000 !important;
+    --tw-prose-bullets: #000000 !important;
+    --tw-prose-hr: #e2e8f0 !important;
+    --tw-prose-quotes: #000000 !important;
+    --tw-prose-quote-borders: #e2e8f0 !important;
+    --tw-prose-captions: #000000 !important;
+    --tw-prose-code: #000000 !important;
+    --tw-prose-pre-code: #ffffff !important;
+    --tw-prose-pre-bg: #0f172a !important;
+    --tw-prose-th-borders: #e2e8f0 !important;
+    --tw-prose-td-borders: #e2e8f0 !important;
+  }
+
+  .dark .prose {
+    --tw-prose-body: #ffffff !important;
+    --tw-prose-headings: #ffffff !important;
+    --tw-prose-lead: #ffffff !important;
+    --tw-prose-links: #60a5fa !important;
+    --tw-prose-bold: #ffffff !important;
+    --tw-prose-counters: #ffffff !important;
+    --tw-prose-bullets: #ffffff !important;
+    --tw-prose-hr: #334155 !important;
+    --tw-prose-quotes: #ffffff !important;
+    --tw-prose-quote-borders: #334155 !important;
+    --tw-prose-captions: #ffffff !important;
+    --tw-prose-code: #ffffff !important;
+    --tw-prose-pre-code: #ffffff !important;
+    --tw-prose-pre-bg: #000000 !important;
+    --tw-prose-th-borders: #334155 !important;
+    --tw-prose-td-borders: #334155 !important;
+  }
+
+  /* Global opacity reset for all text */
+  * {
+    --tw-text-opacity: 1 !important;
+  }
+}

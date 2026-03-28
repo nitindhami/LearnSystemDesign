@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - displayName: string (optional)
+    //   - email: string (required, immutable)
+    //   - photoURL: string (optional)
+    //   - createdAt: timestamp (required, immutable)
+    //   - lastLogin: timestamp (required)
+    //
+    // Collection: users/{userId}/progress
+    // Document ID: {topicId}
+    // Fields:
+    //   - topicId: string (required, immutable)
+    //   - completed: boolean (required)
+    //   - favorited: boolean (required)
+    //   - lastUpdated: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "dhami.nitin@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'lastLogin']) &&
+             data.uid is string && data.uid.size() > 0 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.createdAt is timestamp &&
+             data.lastLogin is timestamp &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
+             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500));
+    }
+
+    function isValidProgress(data) {
+      return data.keys().hasAll(['topicId', 'completed', 'favorited', 'lastUpdated']) &&
+             data.topicId is string && data.topicId.size() > 0 &&
+             data.completed is bool &&
+             data.favorited is bool &&
+             data.lastUpdated is timestamp;
+    }
+
+    // ===============================================================
+    // Match Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if (isOwner(userId) && isValidUser(request.resource.data) &&
+                        request.resource.data.uid == resource.data.uid &&
+                        request.resource.data.email == resource.data.email &&
+                        request.resource.data.createdAt == resource.data.createdAt) ||
+                       isAdmin();
+      allow delete: if isAdmin();
+
+      match /progress/{topicId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidProgress(request.resource.data);
+        allow update: if isOwner(userId) && isValidProgress(request.resource.data) &&
+                         request.resource.data.topicId == resource.data.topicId;
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

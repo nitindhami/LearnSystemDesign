@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user profile information and global settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique identifier for the user." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "photoURL": { "type": "string", "format": "url", "description": "The user's profile picture URL." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the profile was created." },
+        "lastLogin": { "type": "string", "format": "date-time", "description": "When the user last logged in." }
+      },
+      "required": ["uid", "email"]
+    },
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Tracks the user's progress on a specific topic.",
+      "type": "object",
+      "properties": {
+        "topicId": { "type": "string", "description": "The ID of the topic." },
+        "completed": { "type": "boolean", "description": "Whether the topic is completed." },
+        "favorited": { "type": "boolean", "description": "Whether the topic is favorited." },
+        "lastUpdated": { "type": "string", "format": "date-time", "description": "When the progress was last updated." }
+      },
+      "required": ["topicId", "completed", "favorited"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "The user's profile document."
+    },
+    "/users/{userId}/progress/{topicId}": {
+      "schema": "UserProgress",
+      "description": "Progress data for a specific topic."
+    }
+  }
+}
